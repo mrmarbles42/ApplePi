@@ -5,7 +5,7 @@ int temp = ;
 
 //global values
 int dataH, int dataL, int dataT;
-float sensorVal[] = {0,0,0};
+float sensorVal[] = {0,0,0}
 int freq = 10000; //collect data every 10 seconds
 
 void setup() {
