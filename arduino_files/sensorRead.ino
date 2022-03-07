@@ -17,6 +17,7 @@ void setup() {
 }
 
 void loop() {
+	//Read values
 	dataT = analogRead(temp);
 	dataH = analogRead(humid);
 	dataL = analogRead(lit);
