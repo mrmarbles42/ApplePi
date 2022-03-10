@@ -10,6 +10,10 @@ void setup() {
     
 }
 
+void simpleRead(void) {
+
+}
+
 void loop() {
     //MS8607
     sensors_event_t temp, pressure, humidity;
@@ -20,6 +24,3 @@ void loop() {
 
 }
 
-void simpleRead(void) {
-
-}
