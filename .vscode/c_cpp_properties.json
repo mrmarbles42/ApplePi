@@ -7,7 +7,8 @@
             "compilerArgs": [],
             "intelliSenseMode": "windows-msvc-x64",
             "includePath": [
-                "${workspaceFolder}/**"
+                "C:\\Users\\User\\**",
+                "C:/Users/User/AppData/Local/Arduino15/packages/adafruit/hardware/samd/1.7.10/libraries/Wire"
             ],
             "forcedInclude": [],
             "cStandard": "c17",
