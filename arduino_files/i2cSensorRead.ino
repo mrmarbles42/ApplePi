@@ -3,6 +3,9 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
 
+int value = 0;
+#define POWER_PIN 13 //define digital pin attachment
+#define SIGNAL_PIN A0 //define analogRead pin
 
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); 
 Adafruit_MS8607 ms8607;
@@ -106,7 +109,7 @@ void setup() {
 
  if (tsl.begin()) 
   {
-    Serial.println(F("Found a TSL2591 sensor"));
+    Serial.println(F("Found TSL2591 sensor"));
   } 
   else 
   {
@@ -156,6 +159,7 @@ void tslSimpleRead(void) {
   Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));
   Serial.print(F("Luminosity: "));
   Serial.println(x, DEC);
+  delay(500);
 }
 
 void tslAdvancedRead(void) {
@@ -170,13 +174,27 @@ void tslAdvancedRead(void) {
   Serial.print(F("Full: ")); Serial.print(full); Serial.print(F("  "));
   Serial.print(F("Visible: ")); Serial.print(full - ir); Serial.print(F("  "));
   Serial.print(F("Lux: ")); Serial.println(tsl.calculateLux(full, ir), 6);
+  delay(500);
 }
 
+/*
+Water sensor read events
+*/
+void waterSensorRead(void){
+  digitalWrite(POWER_PIN, HIGH);  // turn the sensor ON
+  delay(10);                      // wait 10 milliseconds
+  value = (analogRead(SIGNAL_PIN) * 100) / 400; // read the analog value from sensor and convert to rough %
+  digitalWrite(POWER_PIN, LOW);   // turn the sensor OFF
 
+  Serial.print("Sensor value: ");
+  Serial.println(value);
+}
 
 void loop() {
 msRead();
 tslSimpleRead();
 //tslAdvancedRead();
-delay(500);}
+waterSensorRead();
+delay(500);
+}
 
