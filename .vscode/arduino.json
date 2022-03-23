@@ -1,7 +1,6 @@
 {
-    "configuration": "opt=small,usbstack=arduino,debug=off",
-    "board": "adafruit:samd:adafruit_feather_m0",
-    "port": "COM5",
+    "board": "adafruit:avr:feather32u4",
+    "port": "COM6",
     "programmer": "adafruit:adafruit_jlink",
-    "sketch": "arduino_files\\i2cSensorRead.ino"
+    "sketch": "arduino_files\\i2cSensorRead\\i2cSensorRead.ino"
 }
