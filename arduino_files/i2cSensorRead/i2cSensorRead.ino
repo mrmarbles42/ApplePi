@@ -179,7 +179,7 @@ void tslAdvancedRead(void) {
   // That way you can do whatever math and comparisons you want!
   uint32_t lum = tsl.getFullLuminosity();
   uint16_t ir; 
-  uint16_t full;
+  uint16_t full; 
   ir = lum >> 16;
   full = lum & 0xFFFF;
   Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));

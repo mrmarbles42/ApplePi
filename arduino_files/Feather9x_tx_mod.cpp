@@ -32,10 +32,6 @@ void setup()
   digitalWrite(RFM95_RST, HIGH);
 
   Serial.begin(115200);
-  while (!Serial) {
-  delay(1);
-  }
-
   delay(100);
 
   Serial.println("Feather LoRa TX Test!");
