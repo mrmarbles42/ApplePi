@@ -1,9 +1,9 @@
 //Included libraries
-#include <wire.h>
-#include <RH.RF95.h>
+#include <Wire.h>
+#include <RH_RF95.h>
 #include <Adafruit_MS8607.h>
 #include <Adafruit_Sensor.h>
-#include <"Adafruit_TSL2591.h">
+#include "Adafruit_TSL2591.h"
 
 /*
 DEFINITIONS
@@ -26,12 +26,10 @@ int value = 0;
 #define SIGNAL_PIN A0 //define analogRead pin
 #define VBATPIN 7 //define battery voltage pin
 
-// Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 915.0
+//for RF95
+#define RF95_FREQ 915.0 // Change to 434.0 or other frequency, must match RX's freq!
+RH_RF95 rf95(RFM95_CS, RFM95_INT); // Singleton instance of the radio driver
 
-// Singleton instance of the radio driver
-RH_RF95 rf95(RFM95_CS, RFM95_INT);
-RH_RF95 class does not provide for addressing or
 /**
 RH_RF95 class does not provide for addressing or reliability, 
 so you should only use RH_RF95 if you do not need the higher-level 
@@ -255,14 +253,16 @@ void waterSensorRead(void){
   Serial.println(value);
 }
 
+String csv_val[] = "";
+
 //Print sensor values to csv-style string for transmit
 void csvPrint(void) {
   sensors_event_t temp, pressure, humidity;
   uint16_t x = tsl.getLuminosity(TSL2591_VISIBLE);
   
-  String csv_val = temp.temperature;
-  csv_val += (pressure.pressure);
-  csv_val += humidity.relative_humidity;
+  csv_val = String(temp.temperature, DEC);
+  csv_val = csv_val + String(pressure.pressure);
+  csv_val += String(humidity.relative_humidity);
   csv_val += (x, DEC);
   Serial.println(csv_val);
 }
@@ -271,7 +271,7 @@ void csvPrint(void) {
 void transmitRfm(void) {
       delay(1000); // Wait 1 second between transmits, could also 'sleep' here!
   Serial.println("Transmitting..."); // Send a message to rf95_server
-  
+  int packetnum = 0;
   char radiopacket[20] = "Hello World #      ";
   itoa(packetnum++, radiopacket+13, 10);
   Serial.print("Sending "); Serial.println(radiopacket);
@@ -310,7 +310,7 @@ void transmitRfm(void) {
   }
 
 }
-}
+
 
 //SETUP
 void setup() {
