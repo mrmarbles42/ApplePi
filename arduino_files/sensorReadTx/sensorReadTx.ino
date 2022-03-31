@@ -253,7 +253,7 @@ void waterSensorRead(void){
   Serial.println(value);
 }
 
-String csv_val[] = "";
+String csv_val;
 
 //Print sensor values to csv-style string for transmit
 void csvPrint(void) {
@@ -263,7 +263,7 @@ void csvPrint(void) {
   csv_val = String(temp.temperature, DEC);
   csv_val = csv_val + String(pressure.pressure);
   csv_val += String(humidity.relative_humidity);
-  csv_val += (x, DEC);
+  csv_val += String(x, DEC);
   Serial.println(csv_val);
 }
 
