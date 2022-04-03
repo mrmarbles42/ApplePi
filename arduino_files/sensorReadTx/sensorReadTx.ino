@@ -234,6 +234,8 @@ void tslAdvancedRead(void) {
   uint16_t full;
   ir = lum >> 16;
   full = lum & 0xFFFF;
+  uint16_t lux;
+  lux = (tsl.calculateLux(full,ir), 6);
   Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));
   Serial.print(F("IR: ")); Serial.print(ir);  Serial.print(F("  "));
   Serial.print(F("Full: ")); Serial.print(full); Serial.print(F("  "));
@@ -258,14 +260,15 @@ String csv_val;
 //Print sensor values to csv-style string for transmit
 void csvPrint(void) {
   sensors_event_t temp, pressure, humidity;
-  uint16_t x = tsl.getLuminosity(TSL2591_VISIBLE);
+  //uint16_t x = tsl.getLuminosity(TSL2591_VISIBLE);
+  uint16_t x = tsl.getFullLuminosity();
   
   csv_val = String(temp.temperature, DEC);
-  csv_val = csv_val + ","
+  csv_val = csv_val + ",";
   csv_val = csv_val + String(pressure.pressure);
-  csv_val = csv_val + ","
+  csv_val = csv_val + ",";
   csv_val = csv_val + String(humidity.relative_humidity);
-  csv_val = csv_val + ","
+  csv_val = csv_val + ",";
   csv_val = csv_val + String(x, DEC);
   Serial.println(csv_val);
 }
@@ -331,13 +334,13 @@ void setup() {
 //LOOP
 void loop() {
   //battVoltage();
+  //tslSimpleRead();
+  tslAdvancedRead();
   msRead();
-  tslSimpleRead();
-  //tslAdvancedRead();
   //waterSensorRead();
-
+  delay(1000);
   csvPrint();
-  delay(100);
-  transmitRfm();
-  delay(500);
+  delay(4000);
+  //transmitRfm();
+  //delay(500);
 }
