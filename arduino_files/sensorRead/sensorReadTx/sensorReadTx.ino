@@ -234,8 +234,6 @@ void tslAdvancedRead(void) {
   uint16_t full;
   ir = lum >> 16;
   full = lum & 0xFFFF;
-  uint16_t lux;
-  lux = (tsl.calculateLux(full,ir), 6);
   Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));
   Serial.print(F("IR: ")); Serial.print(ir);  Serial.print(F("  "));
   Serial.print(F("Full: ")); Serial.print(full); Serial.print(F("  "));
@@ -278,10 +276,11 @@ void transmitRfm(void) {
       delay(1000); // Wait 1 second between transmits, could also 'sleep' here!
   Serial.println("Transmitting..."); // Send a message to rf95_server
   int packetnum = 0;
-  char radiopacket[20] = "Hello World #      ";
-  itoa(packetnum++, radiopacket+13, 10);
-  Serial.print("Sending "); Serial.println(radiopacket);
-  radiopacket[19] = 0;
+  char csv_val;
+  itoa(packetnum++, csv_val, 10);
+  Serial.println(csv_val);
+  Serial.print("Sending "); 
+  //radiopacket[19] = 0;
   
   Serial.println("Sending...");
   delay(10);
@@ -334,13 +333,13 @@ void setup() {
 //LOOP
 void loop() {
   //battVoltage();
-  //tslSimpleRead();
-  tslAdvancedRead();
   msRead();
+  tslSimpleRead();
+  //tslAdvancedRead();
   //waterSensorRead();
-  delay(1000);
+
   csvPrint();
-  delay(4000);
-  //transmitRfm();
-  //delay(500);
+  delay(100);
+  transmitRfm();
+  delay(500);
 }
