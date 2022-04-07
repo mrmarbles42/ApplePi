@@ -62,7 +62,7 @@ void configureRfm(void) {
   digitalWrite(RFM95_RST, HIGH);
   delay(10);
 
-  rf95.setModeRx();
+  //rf95.setModeRx();
 
   while (!rf95.init()) {
     Serial.println("LoRa radio init failed");
@@ -78,7 +78,7 @@ void configureRfm(void) {
   }
   Serial.print("Set Freq to: "); Serial.println(RF95_FREQ); //If successful, display transmitter freq
 
-  Serial.println("Max message length: "); Serial.print(rf95.maxMessageLength);
+  //Serial.println("Max message length: "); Serial.print(rf95.maxMessageLength);
 
   
 }
@@ -112,14 +112,15 @@ void receiveRfm(void) {
       Serial.println("Receive failed");
     }
   }
+    }
 }
 void setup() {
     Serial.begin(9600);
-    Serial.println("Receiving!")
+    Serial.println("Receiving!");
     configureRfm();
-}
+ }
 
 void loop() {
+    //configureRfm();
     receiveRfm();
-
 }

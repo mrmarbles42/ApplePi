@@ -4,6 +4,7 @@
 #include <Adafruit_MS8607.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
+#include "Adafruit_SHT4x.h"
 
 /*
 DEFINITIONS
@@ -30,7 +31,7 @@ int value = 0;
 #define RF95_FREQ 915.0 // Change to 434.0 or other frequency, must match RX's freq!
 RH_RF95 rf95(RFM95_CS, RFM95_INT); // Singleton instance of the radio driver
 
-/**
+/** RF95 addressing
 RH_RF95 class does not provide for addressing or reliability, 
 so you should only use RH_RF95 if you do not need the higher-level 
 messaging abilities.
@@ -39,11 +40,11 @@ messaging abilities.
 //Sensor definitions
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); 
 Adafruit_MS8607 ms8607;
+Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 
 /*
 FUNCTIONS
 */
-
 //Read battery voltage
 void battVoltage(void) {
   float measuredvbat = analogRead(VBATPIN);
@@ -70,7 +71,6 @@ void displayTslDetails(void) {
 }
 
 //Configure RFM95 LoRa radio
-
 /*
 Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 The default transmitter power is 13dBm, using PA_BOOST.
@@ -163,6 +163,50 @@ void configureTsl(void) {
   Serial.println(F(""));
 }
 
+//Configure SHT40 (init, precision, and heater)
+ 
+void configureSht(void) { // You can have 3 different precisions, higher precision takes longer
+
+ sht4.setPrecision(SHT4X_HIGH_PRECISION); //Set sensor precision
+  switch (sht4.getPrecision()) {
+     case SHT4X_HIGH_PRECISION: 
+       Serial.println("High precision");
+       break;
+     case SHT4X_MED_PRECISION: 
+       Serial.println("Med precision");
+       break;
+     case SHT4X_LOW_PRECISION: 
+       Serial.println("Low precision");
+       break;
+  }
+
+ sht4.setHeater(SHT4X_NO_HEATER); //Set sensor heater
+   switch (sht4.getHeater()) {
+     case SHT4X_NO_HEATER:  // You can have 6 different heater settings; higher heat and longer times uses more power and reads will take longer too!
+       Serial.println("No heater");
+       break;
+     case SHT4X_HIGH_HEATER_1S: 
+       Serial.println("High heat for 1 second");
+       break;
+     case SHT4X_HIGH_HEATER_100MS: 
+       Serial.println("High heat for 0.1 second");
+       break;
+     case SHT4X_MED_HEATER_1S: 
+       Serial.println("Medium heat for 1 second");
+       break;
+     case SHT4X_MED_HEATER_100MS: 
+       Serial.println("Medium heat for 0.1 second");
+       break;
+     case SHT4X_LOW_HEATER_1S: 
+       Serial.println("Low heat for 1 second");
+       break;
+     case SHT4X_LOW_HEATER_100MS: 
+       Serial.println("Low heat for 0.1 second");
+       break;
+  }
+  
+}
+
 //Configure MS8607 (init and pressure/humidity resolutions)
 void configureMs(void) {
    if (ms8607.begin()) 
@@ -211,7 +255,7 @@ void msRead(void) {
 /*
 Simple data read example. Just read the infrared, fullspecrtrum diode 
 or 'visible' (difference between the two) channels.
-This can take 100-600 milliseconds! Uncomment whichever of the following you want to read
+This can take 100-600 milliseconds!
 */
 void tslSimpleRead(void) {
   uint16_t x = tsl.getLuminosity(TSL2591_VISIBLE);
@@ -224,6 +268,19 @@ void tslSimpleRead(void) {
   delay(500);
 }
 
+void shtRead(void) {
+  sensors_event_t humidity, temp;
+  
+  //uint32_t timestamp = millis();
+  sht4.getEvent(&humidity, &temp);// populate temp and humidity objects with fresh data
+  //timestamp = millis() - timestamp;
+
+  Serial.print("Temperature: "); Serial.print(temp.temperature); Serial.println(" degrees C");
+  Serial.print("Humidity: "); Serial.print(humidity.relative_humidity); Serial.println("% rH");
+
+  Serial.print("Read duration (ms): ");
+  //Serial.println(timestamp);
+}
 /*
 More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
 That way you can do whatever math and comparisons you want!
@@ -284,7 +341,7 @@ void transmitRfm(void) {
   
   Serial.println("Sending...");
   delay(10);
-  rf95.send((uint8_t *)radiopacket, 20);
+  rf95.send((uint8_t *)csv_val, 20);
 
   Serial.println("Waiting for packet to complete..."); 
   delay(10);
@@ -327,19 +384,26 @@ void setup() {
   configureTsl();
   configureMs();
   configureRfm();
+  configureSht();
   displayTslDetails();
 }
 
 //LOOP
 void loop() {
   //battVoltage();
+
+  tslAdvancedRead();
+  //tslSimpleRead();
   msRead();
-  tslSimpleRead();
-  //tslAdvancedRead();
+  //shtRead();
   //waterSensorRead();
 
   csvPrint();
   delay(100);
   transmitRfm();
-  delay(500);
+  delay(1000);
 }
+
+
+byte csv_val2[] = {temp.temperature, pressure.pressure, humidity.relative_humidity, tsl.getFullluminosity()};
+Serial.println(csv_val2)
